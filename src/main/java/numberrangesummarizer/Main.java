@@ -14,7 +14,7 @@ public class Main {
 
         String outputString = summarizer.summarizeCollection(collectedNumbers);
 
-        System.out.println("Input: " + input);
+        System.out.println("Input List: " + input);
         System.out.println("Output: " + outputString);
     }
 }
