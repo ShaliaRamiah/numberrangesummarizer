@@ -10,6 +10,15 @@ public class RangeSummarizer implements NumberRangeSummarizer {
     public Collection<Integer> collect(String input) {
         List<Integer> collectedNumbers = Stream.of(input.split(","))
                 .map(String::trim)
+                .filter(s -> {
+                    try {
+                        Integer.parseInt(s);
+                        return true;
+                    } catch (NumberFormatException e) {
+                        System.err.println("Invalid input: " + s + ". Excluded.");
+                        return false;
+                    }
+                })
                 .map(Integer::parseInt)
                 .collect(Collectors.toList());
 
