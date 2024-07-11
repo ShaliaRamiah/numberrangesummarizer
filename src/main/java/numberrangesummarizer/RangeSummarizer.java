@@ -8,25 +8,29 @@ public class RangeSummarizer implements NumberRangeSummarizer {
 
     @Override
     public Collection<Integer> collect(String input) {
-        List<Integer> collectedNumbers = Stream.of(input.split(","))
-                .map(String::trim)
-                .filter(s -> {
-                    try {
-                        Integer.parseInt(s);
-                        return true;
-                    } catch (NumberFormatException e) {
-                        System.err.println("Invalid input: " + s + ". Excluded.");
-                        return false;
-                    }
-                })
-                .map(Integer::parseInt)
-                .collect(Collectors.toList());
+        Set<Integer> uniqueNumbers = new HashSet<>();
+        List<Integer> collectedNumbers;
 
-        collectedNumbers = collectedNumbers.stream()
-                .sorted((num1, num2) -> num1.compareTo(num2))
-                .collect(Collectors.toList());
+        try {
+            // split input, trim white space, parse to int, filter duplicates
+            collectedNumbers = Stream.of(input.split(","))
+                    .map(String::trim)
+                    .map(Integer::parseInt)
+                    .filter(num -> {
+                        if (!uniqueNumbers.add(num)) {
+                            return false; // skipping duplicates
+                        }
+                        return true; // adding unique
+                    })
+                    .collect(Collectors.toList());
+            // sort numbers
+            collectedNumbers.sort((num1, num2) -> num1.compareTo(num2));
 
-        return collectedNumbers;
+        } catch (NumberFormatException e) {
+            throw new InvalidInputException(e.getMessage()); // invalid number format
+        }
+
+        return collectedNumbers; // sorted and unique integers
     }
 
     @Override
@@ -36,22 +40,24 @@ public class RangeSummarizer implements NumberRangeSummarizer {
 
         for (int i = 0; i < collectedNumbers.size(); i++) {
             int rangeFirst = collectedNumbers.get(i);
+            // checking numbers to form ranges
             while (i < collectedNumbers.size() - 1 && collectedNumbers.get(i) + 1 == collectedNumbers.get(i + 1)) {
                 i++;
             }
             int sequenceEnd = collectedNumbers.get(i);
 
+            // adding ranges/single nums to output
             if (rangeFirst == sequenceEnd) {
                 outputString.append(rangeFirst);
             } else {
                 outputString.append(rangeFirst).append("-").append(sequenceEnd);
             }
-
+            // adding comma and space, not last element
             if (i < collectedNumbers.size() - 1) {
                 outputString.append(", ");
             }
         }
 
-        return outputString.toString();
+        return outputString.toString(); // return summarised string
     }
 }
